@@ -1,6 +1,6 @@
 # VoxScatter
 
-Matlab repository for computing electromagnetic (EM) scattering by dielectric particles.
+Matlab repository for computing electromagnetic scattering by dielectric particles.
 
 The code solves the electric volume integral equation via a choice of two (similar) techniques:
 
