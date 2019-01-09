@@ -6,39 +6,21 @@
 %  travelling in the x-direction incident upon a particle in fixed
 %  orientation.
 %
-%  Very much a development version - email me at samgroth@mit.edu with
-%  questions/comments/suggestions.
-%
-%  The only portions you need to worry about are the "Parameter entry" at
-%  the top and the "Outputs" at the bottom.
-%
-%  S.P.Groth 13/2/17
-%
 %-------------------------------------------------------------------------%
 close all
 clear;
 format compact
-% format long
 %% Add the corresponding path
 addpath(genpath('piecewise_constant'))
 
-% Add a test comment
-
-SIZE_PARAM = [10 20 30 40 60 80 100];
-REF_RE = [1.2 1.6 1.8 2];
-REF_NAME = {'1p2','1p6','1p8','2'};
-
-for i_param = 6:length(SIZE_PARAM)
-    for i_ref = 1:1%length(REF_RE)
-
 %% Parameter entry
 
-sizeParam = SIZE_PARAM(i_param);%3.788399944423817;  % size paramter ko*a
+sizeParam = 10;%3.788399944423817;  % size paramter ko*a
 nPerLam = 10;    % number of voxels per wavelength (10 for rough solution, 20 for one percent or better)
 geom = 'hex'; % current choice: hex, sphere, spheroid (please ask me to add more, if required)
 
 % Refractive of ice
-refRe = REF_RE(i_ref);      % real part
+refRe = 1.7;      % real part
 refIm = 0;%2.289e-9;   % imaginary part
 
 % Gometry parameters (alter appropriate geometry)
@@ -183,8 +165,6 @@ if av==1
     end
 end
 
-% keyboard
-
 % -------------------------------------------------------------------------
 %                  Generate circulants
 % -------------------------------------------------------------------------
@@ -212,80 +192,6 @@ nD = L*M*N; % number of variables in the system
 % get the positions of the non-air voxels in the 3D grid
 idxS = find(abs(Mc(:)) > 1e-12); % these are the indexes of the non-air voxel positions
 idxS3 = [idxS; nD+idxS; 2*nD+idxS]; % the vector of non-air positions for 3 Cartesian components
-
-% form = 2; % Always solve JVIE 2.
-% if form==2
-%     Mc(:) = Mc(:)./Mr(:);
-%     % notice that Vrhs is only defined for non-air components
-%     Mr(:) = Mr(:)./Mr(:);
-%
-% end
-%
-% tau = 1j*omega*eo*Mc;
-% tau3 = [tau(:); tau(:); tau(:)]; % 3 Cartesian components in vector form
-
-% get the RHS for the solver
-% notice that only the non-air positions in Cartesian components are used
-% Vrhs = Gram.*tau3(idxS3).*Einc(idxS3);
-%
-% if form==2
-%     if L==1
-%         Vrhs(:) = Vrhs(:)./[squeeze(Mr(idxS)); squeeze(Mr(idxS)); squeeze(Mr(idxS))];
-%     else
-%         Vrhs(:) = Vrhs(:)./[Mr(idxS); Mr(idxS); Mr(idxS)]; % notice that Vrhs is only defined for non-air components
-%     end
-% end
-%
-% fACPU   = @(J)mv_AN_const(J, fN, Mr, Mc, Gram, 'notransp', idxS3, 0);
-%
-% tini2 = tic;
-%
-% tic
-% [circ_N,circ_L_opToep] = level_1_parallel_func_N(opToep,L,...
-%     M,N,Gram,0,'off');
-% disp('Circulant approximation of N operator');
-% toc
-
-
-% [circ_M_opToep,circ_2_N] = circ_2_level_fast_test(circ_L_opToep,L,M,N);
-% %
-% for i=1:L
-%     for j=1:M
-%         circ_2_inv_T{i,j} = inv(Gram*eye(3*N)-(e_r-1)/e_r*circ_2_N{i,j});
-%     end
-% end
-% disp('2-level assembly')
-% t_2level = toc(tini2)
-%
-% prec2 = @(J) chan_2_mvp_for_parallel_idx(circ_2_inv_T,J,L,M,N,idxS3);
-%
-% tic
-% [circ_2_inv_T] = level_2_parallel_func(opToep,Mc,Mr,L,M,N,Gram);
-% disp('Second level assembly');
-% toc
-
-
-%--------------------------- Solve system --------------------------------%
-% tol = 1e-5;
-% % Solve without preconditioner
-% tiniV0=tic;
-% [vsolV0,~,~,~,resvecV0] = pgmres(@(J)fACPU(J), Vrhs,2000, tol, 1);
-% %[vsolV0,~,~,~,resvecV0] = bicgstab(@(J)fACPU(J), Vrhs, tol, 2000);
-% tendV0=toc(tiniV0);
-% nIts_0 = length(resvecV0);
-% fprintf('No preconditioner. Solve time = %.2f [sec] \n',tendV0)
-% fprintf('Iteration count = %d \n',nIts_0);
-%
-% % Solve without preconditioner
-% tiniV1=tic;
-% [vsolV1,~,~,~,resvecV1] = pgmres(@(J)fACPU(J), Vrhs,2000, tol, 1,@(J)prec2(J));
-% %[vsolV1,~,~,~,resvecV1] = bicgstab(@(J)fACPU(J), Vrhs, tol, 2000,@(J)prec2(J));
-% tendV1=toc(tiniV1);
-% nIts_0 = length(resvecV1);
-% fprintf('Preconditioner. Solve time = %.2f [sec] \n',tendV1)
-% fprintf('Iteration count = %d \n',nIts_0);
-
-% keyboard
 
 kvec=k;
 
@@ -460,7 +366,7 @@ prec2_T = @(J) chan_2_mvp_for_parallel_idx(circ_2_inv_T,J,L,M,N,idxS3);
 tol = 1e-5;
 % % Solve without preconditioner
 tiniD0=tic;
-[vsolD0,~,~,~,resvecD0_GM] = pgmres(@(J)fACPU(J), Vrhs,2000, tol,1);%,@(J)prec2_T(J));
+[vsolD0,~,~,~,resvecD0_GM] = gmres(@(J)fACPU(J), Vrhs,2000, tol,1);%,@(J)prec2_T(J));
 % [vsolD0,~,~,~,resvecD0] = bicgstab(@(J)fACPU(J), Vrhs, tol, 2000);
 tendD0_GM=toc(tiniD0);
 nIts_0 = length(resvecD0_GM);
@@ -507,30 +413,3 @@ Chi = (refInd.^2-1)/(4*pi);
 
 % vDDA = vsolD1./(Gram*Chi);
 % vVIE = conj(vsolV1./(1j*omega*eo*(e_r-1)));
-
-filename=['results_hex_DDA/hex_plate_fifth_DDA_no_prec_both_GMRES_BICG_refInd',REF_NAME{i_ref},'_sizeParam',num2str(sizeParam),...
-    '_nPerLam',num2str(nPerLam)];
-save(filename,'resvecD0_GM','resvecD0_BI','numVox','numVoxIce',...
-    'tendD0_GM','tendD0_BI','tOpAss','s_opCirc')
-
-% keyboard
-% save(filename,'resvecD0_GM','numVox','numVoxIce',...
-%     'tendD0_GM','tOpAss','s_opCirc')
-% save(filename,'resvecD0','resvecD1','numVox','numVoxIce',...
-%     'tendD0','tendD1','t_2level','tOpAss','s_opCirc','s_circ_2')
-% save(filename,'resvecD1_GM','resvecD1_GM','numVox','numVoxIce',...
-%     'tendD1_GM','tendD1_GM','t_2level','tOpAss','s_opCirc','s_circ_2')
-% save(filename,'resvecD1_GM','resvecD1','numVox','numVoxIce',...
-%     'tendD1_GM','tendD1','t_2level','tOpAss','s_opCirc','s_circ_2')
-% save(filename,'resvecD1','numVox','numVoxIce',...
-%     'tendD1','t_2level','tOpAss','s_opCirc','s_circ_2')
-
-% filename=['results_hex/hex_plate_VIE_DDA_gmres_refInd','1p6','_sizeParam',num2str(sizeParam),...
-%     '_nPerLam',num2str(nPerLam)];
-% save(filename,'resvecV0','resvecV1','resvecD0','resvecD1','numVox','numVoxIce',...
-%     'tendD0','tendD1','tendV0','tendV1')
-
-clearvars -except SIZE_PARAM REF_RE i_param i_ref REF_NAME
-
-    end
-end
