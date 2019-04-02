@@ -13,7 +13,7 @@ inhomogeneous dielectric objects. Journal of Computational Physics, 269:280–29
 repository https://github.com/thanospol/MARIE
 
 Both approaches use a voxelized (uniform) discretization of the particle. This enables the acceleration of 
-matrix-vector products with the fast-Fourier transform (FFT).
+matrix-vector products with the fast-Fourier transform (FFT). The second approach has better conditioning properties, especially for large refractive indices.
 
 ## Circulant preconditioning
 
