@@ -36,6 +36,7 @@ for i_loop=1:L
     C3 = zeros(M,N);
     for i=2:M
         C3(i,:) = (M+1-i)/M.*D(i,:)+(i-1)/M.*D(M-i+2,:);
+%           C3(i,:) = (M+1-i)/M.*D(i,:)-(i-1)/M.*D(M-i+2,:);
     end
     C3(1,:) = D(1,:);
     CC3=fft(C3);
@@ -109,7 +110,10 @@ for i_loop=1:L
         % Third block
         for j=1:1
             for i=1:1
-                chan{i}=toeplitz(-CC3(j_loop,1:N),CC3(j_loop,1:N));
+%                 keyboard
+%                 chan{i}=toeplitz(-CC3(j_loop,1:N),CC3(j_loop,1:N));
+                chan{i}=toeplitz([CC3(j_loop,1) -CC3(j_loop,2:N)],...
+                    CC3(j_loop,1:N));
             end
             result=cell2mat(chan(toeplitz(1:1)));
         end
