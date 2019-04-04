@@ -16,6 +16,8 @@
 close all; 
 clear;
 format compact;
+%% Add the directory path
+addpath(genpath('piecewise_constant'))
 
 %% Geometrical parameters
 % load('meshes/Head_model_Billie.mat')
@@ -127,7 +129,7 @@ axis image
 %% Preconditioner assembly
 % Compute 1-level circulant approximation to Toeplitz operator
 tic
-[circ_N,circ_L_opToep] = circ_1_level(opToeplitz, L, M, N, 0, 'on');
+[circ_N,circ_L_opToep] = circ_1_level(opToeplitz, L, M, N, 0, 'off');
 
 % Compute 2-level circulant approximation to Toeplitz operator
 [circ_M_opToep,circ_2_N] = circ_2_level(circ_L_opToep,L,M,N);
@@ -180,35 +182,36 @@ for i=1:L
         circ_2_inv{i,j} = inv(circ_2_temp);
     end
 end
+disp('Inversion of 2-level circulant preconditioner');
 toc
 
- tic
-circ_inv=cell(L);
-parfor i=1:L
-    circ_temp = Gram*eye(3*M*N)-face3mat*circ_N{i};
-    circ_inv{i} = inv(circ_temp);
-end
-disp('Inversion of 1-level circulant preconditioner');
-toc
+%  tic
+% circ_inv=cell(L);
+% parfor i=1:L
+%     circ_temp = Gram*eye(3*M*N)-face3mat*circ_N{i};
+%     circ_inv{i} = inv(circ_temp);
+% end
+% disp('Inversion of 1-level circulant preconditioner');
+% toc
 
 % MVP function for precondioner inverse
 prec = @(J) mvp_circ_2_level(circ_2_inv,J,L,M,N,idx3);
 
-prec1 = @(J) chan_mvp_idx(circ_inv,J,L,M,N,idx3);
+% prec1 = @(J) chan_mvp_idx(circ_inv,J,L,M,N,idx3);
 
 tini1_gmres=tic;
 [vsol1_gmres,~,~,~,resvec1_gmres] = gmres(@(J)fACPU(J), Vrhs, 2000,...
     tol, 1, @(J)prec(J));
 tend1_gmres=toc(tini1_gmres);
 nIts_1_gmres = length(resvec1_gmres);
-fprintf('GMRES WITH preconditioner. Solve time = %.2f [sec] \n',tend1_gmres)
+fprintf('GMRES WITH 2-level preconditioner. Solve time = %.2f [sec] \n',tend1_gmres)
 fprintf('Iteration count = %d \n',nIts_1_gmres);
 
-tini1_gmres=tic;
-[vsol1_gmres,~,~,~,resvec1_gmres] = gmres(@(J)fACPU(J), Vrhs, 2000,...
-    tol, 1, @(J)prec1(J));
-tend1_gmres=toc(tini1_gmres);
-nIts_1_gmres = length(resvec1_gmres);
-fprintf('GMRES WITH preconditioner. Solve time = %.2f [sec] \n',tend1_gmres)
-fprintf('Iteration count = %d \n',nIts_1_gmres);
+% tini1_gmres=tic;
+% [vsol1_gmres,~,~,~,resvec1_gmres] = gmres(@(J)fACPU(J), Vrhs, 2000,...
+%     tol, 1, @(J)prec1(J));
+% tend1_gmres=toc(tini1_gmres);
+% nIts_1_gmres = length(resvec1_gmres);
+% fprintf('GMRES WITH 1-level preconditioner. Solve time = %.2f [sec] \n',tend1_gmres)
+% fprintf('Iteration count = %d \n',nIts_1_gmres);
 
