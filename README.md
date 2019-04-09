@@ -19,4 +19,4 @@ matrix-vector products with the fast-Fourier transform (FFT). The second approac
 
 The convergence of the iterative solves are hugely accelerated by the use of preconditioners based on the circulant 
 approximation of the system matrix. Efficient implementations of the 1- and 2-level circulant preconditioners of 
-Chan and Olkin are included. See our preprint https://arxiv.org/abs/1903.09802 for details.
+Chan and Olkin are included. See our preprint https://arxiv.org/abs/1903.09802 for details. The results in this preprint can be generated from the script main_DDA.m
