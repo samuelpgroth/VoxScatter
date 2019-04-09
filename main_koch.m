@@ -20,22 +20,24 @@ clear;
 format compact;
 
 %% Geometrical parameters
-sizeParam = 30;  % size parameter
-geom = 'hex';   % shape - sphere/spheroid/hex/cube
+sizeParam = 20;  % size parameter
 nPerLam = 10;    % number of voxels per interior wavelength
 
 % Refractive index of scatterer (real and imaginary parts)
-refRe = 1.4;
+refRe = 1.7;
 refIm = 0;
 
 %% Generate voxel coordinates and vizualize
 refInd = refRe + 1i*refIm;
 % [r, idx, res, P, lambda_ext, lambda_int] = ...
 %     geometry(geom, refInd, sizeParam, nPerLam);
-koch_snowflake;
-idx = find(in);
+
+% Need to neaten this Koch example and place into geometry.m
 lambda_ext = 2*pi/sizeParam; % exterior wavelength of incident wave
 lambda_int = lambda_ext/real(refInd); % interior wavelength
+aspectRatio = 1/20;
+koch_snowflake;
+idx = find(in);
 
 [L,M,N,~]=size(r);
 nD = L * M * N;   % number of voxels in simulation domain

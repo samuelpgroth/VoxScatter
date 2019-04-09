@@ -105,8 +105,8 @@ fACPU   = @(J)mv_AN_const(J, fN, Mr, Mc, Gram, 'notransp', idxS3, 0);
 tol = 1e-12;
  % Solve without preconditioner
  tini=tic;
- [x,flag,relres,iter,resvec] = gmres(@(J)fACPU(J), Vrhs,500, tol, 1);
-% [x,flag,relres,iter,resvec] = bicgstab(@(J)fACPU(J), Vrhs, tol, 2000);
+%  [x,flag,relres,iter,resvec] = gmres(@(J)fACPU(J), Vrhs,500, tol, 1);
+[x,flag,relres,iter,resvec] = bicgstab(@(J)fACPU(J), Vrhs, tol, 2000);
  tend=toc(tini);
  nIts_0 = length(resvec);
  fprintf('No preconditioner. Solve time = %.2f [sec] \n',tend)
@@ -200,8 +200,10 @@ prec = @(J) mvp_circ_2_level(circ_2_inv,J,L,M,N,idx3);
 % prec1 = @(J) chan_mvp_idx(circ_inv,J,L,M,N,idx3);
 
 tini1_gmres=tic;
-[vsol1_gmres,~,~,~,resvec1_gmres] = gmres(@(J)fACPU(J), Vrhs, 2000,...
-    tol, 1, @(J)prec(J));
+% [vsol1_gmres,~,~,~,resvec1_gmres] = gmres(@(J)fACPU(J), Vrhs, 2000,...
+%     tol, 1, @(J)prec(J));
+[vsol1_gmres,~,~,~,resvec1_gmres] = bicgstab(@(J)fACPU(J), Vrhs, tol, 2000,...
+    @(J)prec(J));
 tend1_gmres=toc(tini1_gmres);
 nIts_1_gmres = length(resvec1_gmres);
 fprintf('GMRES WITH 2-level preconditioner. Solve time = %.2f [sec] \n',tend1_gmres)
