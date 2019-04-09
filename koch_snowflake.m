@@ -19,9 +19,6 @@ for iteration=1:5
     newP( 4*size(P,1)+1,:) = P(size(P,1),:);
     P = newP;
 end
-figure
-plot(P(:,1),P(:,2));
-axis image
 
 %% Now I go about creating a bounding box and the voxelized grid. 
 
@@ -47,6 +44,10 @@ ymax = max(P(:,2));
 dom_x = xmax - xmin;
 dom_y = ymax - ymin;
 dom_z = dom_y * aspectRatio;
+
+figure
+plot(P(:,1),P(:,2));
+axis image
 
 %% Create uniform grid of bounding box, including endpoints
 
