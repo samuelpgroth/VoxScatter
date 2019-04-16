@@ -17,7 +17,7 @@ close all;
 clear;
 format compact;
 %% Add the directory path
-addpath(genpath('piecewise_constant'))
+addpath(genpath('src'))
 
 %% Geometrical parameters
 % load('meshes/Head_model_Billie.mat')

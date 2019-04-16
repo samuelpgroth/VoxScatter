@@ -18,6 +18,7 @@
 close all; 
 clear;
 format compact;
+addpath(genpath('src'))
 
 %% Geometrical parameters
 sizeParam = 20;  % size parameter

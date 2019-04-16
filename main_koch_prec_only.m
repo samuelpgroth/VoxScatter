@@ -18,10 +18,11 @@
 close all; 
 clear;
 format compact;
+addpath(genpath('src'))
 
 %% Geometrical parameters
-sizeParam = 30;  % size parameter
-nPerLam = 15;    % number of voxels per interior wavelength
+sizeParam = 20;  % size parameter
+nPerLam = 10;    % number of voxels per interior wavelength
 
 % Refractive index of scatterer (real and imaginary parts)
 refRe = 1.5;
