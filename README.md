@@ -27,5 +27,11 @@ main_DDA.m performs scattering by hexagonal plates. We demonstrate the performan
 main_koch.m is the same as above but for Koch fractal snowflakes.
 
 main_koch_prec_only.m is the same as main_koch.m but with only one solve - with preconditioning via BiCG-Stab (the fastest). This produces pretty pictures, for example:
+![koch_scatter](https://user-images.githubusercontent.com/13260045/56199494-efd83280-6034-11e9-8966-5851276a31f5.png)
 
 ## To do:
+1. Add the volume integral equation (rigorous implementation) as an option. Show comparision with "standard" DDA.
+
+2. Far-field scattering routine.
+
+3. Random orientation.
