@@ -45,10 +45,6 @@ dom_x = xmax - xmin;
 dom_y = ymax - ymin;
 dom_z = dom_y * aspectRatio;
 
-figure
-plot(P(:,1),P(:,2));
-axis image
-
 %% Create uniform grid of bounding box, including endpoints
 
 % Preferential dimension: 

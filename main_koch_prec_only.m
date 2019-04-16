@@ -20,11 +20,11 @@ clear;
 format compact;
 
 %% Geometrical parameters
-sizeParam = 20;  % size parameter
-nPerLam = 10;    % number of voxels per interior wavelength
+sizeParam = 30;  % size parameter
+nPerLam = 15;    % number of voxels per interior wavelength
 
 % Refractive index of scatterer (real and imaginary parts)
-refRe = 1.7;
+refRe = 1.5;
 refIm = 0;
 
 %% Generate voxel coordinates and vizualize
@@ -80,24 +80,6 @@ idx3 = [idx; nD+idx; 2*nD+idx]; % the vector of non-air positions for 3 Cartesia
 % Matrix-vector product
 MVP_DDA = @(J)MVP(J, operator_circ, id, dV*chi, 1/alpha_LDR, 'notransp', idx3, 0);
 
-%% Solve system with UNPRECONDITIONED iterative method
-tol = 1e-5;
-% Solve with preconditioner
-tini0=tic;
-Vrhs = Einc(idx3);
-[vsol0,~,~,~,resvec0] = bicgstab(@(J)MVP_DDA(J), Vrhs, tol, 2000);
-tend0=toc(tini0);
-nIts_0 = length(resvec0);
-fprintf('BICG NO preconditioner. Solve time = %.2f [sec] \n',tend0)
-fprintf('Iteration count = %d \n',nIts_0);
-
-tini0_gmres=tic;
-[vsol0_gmres,~,~,~,resvec0_gmres] = gmres(@(J)MVP_DDA(J), Vrhs, 2000, tol, 1);
-tend0_gmres=toc(tini0_gmres);
-nIts_0_gmres = length(resvec0_gmres);
-fprintf('GMRES NO preconditioner. Solve time = %.2f [sec] \n',tend0_gmres)
-fprintf('Iteration count = %d \n',nIts_0_gmres);
-
 %% Preconditioner assembly
 % Compute 1-level circulant approximation to Toeplitz operator
 tic
@@ -122,6 +104,8 @@ toc
 prec = @(J) mvp_circ_2_level(circ_2_inv,J,L,M,N,idx3);
 
 %% Solve system with PRECONDITIONED iterative method
+tol = 1e-5;
+Vrhs = Einc(idx3);
 tini1=tic;
 [vsol1,~,~,~,resvec1] = bicgstab(@(J)MVP_DDA(J), Vrhs, tol, 2000,...
     @(J)prec(J));
@@ -129,14 +113,6 @@ tend1=toc(tini1);
 nIts_1 = length(resvec1);
 fprintf('BICG WITH preconditioner. Solve time = %.2f [sec] \n',tend1)
 fprintf('Iteration count = %d \n',nIts_1);
-
-tini1_gmres=tic;
-[vsol1_gmres,~,~,~,resvec1_gmres] = gmres(@(J)MVP_DDA(J), Vrhs, 2000,...
-    tol, 1, @(J)prec(J));
-tend1_gmres=toc(tini1_gmres);
-nIts_1_gmres = length(resvec1_gmres);
-fprintf('GMRES WITH preconditioner. Solve time = %.2f [sec] \n',tend1_gmres)
-fprintf('Iteration count = %d \n',nIts_1_gmres);
 
 %% Gather and visualize total (incident + scattered) field
 Pout = zeros(L,M,N,3);  % Polarizations
@@ -162,15 +138,4 @@ colormap bluewhitered
 colorbar
 hold on
 plot(P(:,1),P(:,2),'k','LineWidth',2);
-
-
-%% Check residuals
-BICG_unprec_resid = norm(MVP_DDA(vsol0)-Vrhs)/norm(Vrhs);
-BICG_prec_resid = norm(MVP_DDA(vsol1)-Vrhs)/norm(Vrhs);
-GMRES_unprec_resid = norm(MVP_DDA(vsol0_gmres)-Vrhs)/norm(Vrhs);
-GMRES_prec_resid = norm(MVP_DDA(vsol1_gmres)-Vrhs)/norm(Vrhs);
-
-fprintf('Residual in unpreconditioned BiCG-Stab = %d \n',BICG_unprec_resid);
-fprintf('Residual in preconditioned BiCG-Stab   = %d \n',BICG_prec_resid);
-fprintf('Residual in unpreconditioned GMRES     = %d \n',GMRES_unprec_resid);
-fprintf('Residual in preconditioned GMRES       = %d \n',GMRES_prec_resid);
+set(gcf,'color','w')
