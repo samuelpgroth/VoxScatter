@@ -20,3 +20,12 @@ matrix-vector products with the fast-Fourier transform (FFT). The second approac
 The convergence of the iterative solves are hugely accelerated by the use of preconditioners based on the circulant 
 approximation of the system matrix. Efficient implementations of the 1- and 2-level circulant preconditioners of 
 Chan and Olkin are included. See our preprint https://arxiv.org/abs/1903.09802 for details. The results in this preprint can be generated from the script main_DDA.m
+
+## Current example scripts
+main_DDA.m performs scattering by hexagonal plates. We demonstrate the performance of circulant preconditioning by solving the linear system four times: twice without preconditioning (via BiCG-Stab, GMRES) and twice with preconditiong (via BiCG-Stab, GMRES). Should agree with results presented in our preprint https://arxiv.org/abs/1903.09802
+
+main_koch.m is the same as above but for Koch fractal snowflakes.
+
+main_koch_prec_only.m is the same as main_koch.m but with only one solve - with preconditioning via BiCG-Stab (the fastest). This produces pretty pictures, for example:
+
+## To do:
